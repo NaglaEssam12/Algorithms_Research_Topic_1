@@ -19,6 +19,7 @@ import edu.uci.ics.jung.visualization.decorators.PickableVertexPaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
 import java.awt.Color;
+import java.util.concurrent.TimeUnit;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -70,11 +71,13 @@ public class GraphGui {
     private JFrame maxFlowFrame;
     private JTextField numofverticestext;
     private JTextField numofEdgestext;
+    private JTextField srctext;
     private JTextField sourcetext;
     private JTextField sinktext;
     int numofvertices = 0;
     int numofEdges = 0;
     int source = 0;
+    int src = 0;
     int sink = 0;
     JTextArea iotext;
     JTextArea iotext1;
@@ -90,7 +93,8 @@ public class GraphGui {
     private JLabel maxflowlblNewLabel5;
     boolean Dijkstra = false;
     boolean Dijkstra_directed = false;
-    boolean MaxFlow = false;
+    static boolean MaxFlow = false;
+    boolean step = false;
     static boolean visible = true;
 
     /**
@@ -179,7 +183,7 @@ public class GraphGui {
                 }
             }
         }
-
+        
         Layout<Integer, String> layout = new CircleLayout(graph);
         layout.setSize(new Dimension(400, 400)); // sets the initial size of the space
         // The BasicVisualizationServer<V,E> is parameterized by the edge types
@@ -192,7 +196,13 @@ public class GraphGui {
 
         vv.getRenderContext().setEdgeFontTransformer(new ConstantTransformer(new Font("SansSerif", Font.BOLD, 14)));
         vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
-
+         
+        /*try {
+                                TimeUnit.SECONDS.sleep(10);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }*/
+        
         JFrame frame = new JFrame(name);
         frame.setBounds(x1, y1, 300, 400);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -320,40 +330,46 @@ public class GraphGui {
         lblNumberOfVertices.setFont(new Font("SansSerif", Font.BOLD, 14));
         maxFlowFrame.getContentPane().add(lblNumberOfVertices);
 
-        maxflowlblNewLabel2 = new JLabel("Examble : 3");
+       /* maxflowlblNewLabel2 = new JLabel("Examble : 3");
         maxflowlblNewLabel2.setBounds(270, 21, 100, 14);
         maxflowlblNewLabel2.setFont(new Font("SansSerif", Font.BOLD, 14));
-        maxFlowFrame.getContentPane().add(maxflowlblNewLabel2);
+        maxFlowFrame.getContentPane().add(maxflowlblNewLabel2);*/
 
         JLabel lblNumberOfEdges = new JLabel("Number of Edgs");
         lblNumberOfEdges.setBounds(10, 41, 212, 27);
         lblNumberOfEdges.setFont(new Font("SansSerif", Font.BOLD, 14));
         maxFlowFrame.getContentPane().add(lblNumberOfEdges);
 
-        maxflowlblNewLabel3 = new JLabel("Examble : 3");
+        /*maxflowlblNewLabel3 = new JLabel("Examble : 3");
         maxflowlblNewLabel3.setBounds(270, 41, 100, 14);
         maxflowlblNewLabel3.setFont(new Font("SansSerif", Font.BOLD, 14));
-        maxFlowFrame.getContentPane().add(maxflowlblNewLabel3);
+        maxFlowFrame.getContentPane().add(maxflowlblNewLabel3);*/
 
         JLabel lblsource = new JLabel("Source");
         lblsource.setBounds(10, 63, 200, 20);
         lblsource.setFont(new Font("SansSerif", Font.BOLD, 14));
         maxFlowFrame.getContentPane().add(lblsource);
         
-        maxflowlblNewLabel5 = new JLabel("Examble : 0");
+        /*maxflowlblNewLabel5 = new JLabel("Examble : 0");
         maxflowlblNewLabel5.setBounds(270, 61,100 , 14);
         maxflowlblNewLabel5.setFont(new Font("SansSerif", Font.BOLD, 14));
-        maxFlowFrame.getContentPane().add(maxflowlblNewLabel5);
+        maxFlowFrame.getContentPane().add(maxflowlblNewLabel5);*/
 
         JLabel lblsink = new JLabel("Sink");
         lblsink.setBounds(10, 86, 150, 14);
         lblsink.setFont(new Font("SansSerif", Font.BOLD, 14));
         maxFlowFrame.getContentPane().add(lblsink);
         
-        maxflowlblNewLabel4 = new JLabel("Examble : 2");
+        JCheckBox outputStepsCheckBox = new JCheckBox("Output Steps ");
+        outputStepsCheckBox.setBounds(300, 167, 300, 30);
+        outputStepsCheckBox.setFont(new Font("SansSerif", Font.BOLD, 13));
+        outputStepsCheckBox.setBackground(Color.PINK);
+        maxFlowFrame.getContentPane().add(outputStepsCheckBox);
+        
+       /* maxflowlblNewLabel4 = new JLabel("Examble : 2");
         maxflowlblNewLabel4.setBounds(270, 81,100 , 14);
         maxflowlblNewLabel4.setFont(new Font("SansSerif", Font.BOLD, 14));
-        maxFlowFrame.getContentPane().add(maxflowlblNewLabel4);
+        maxFlowFrame.getContentPane().add(maxflowlblNewLabel4);*/
         JButton myClearButton= new JButton("Clear");
          myClearButton.setFont(new Font("SansSerif", Font.BOLD, 13));
        myClearButton.addActionListener(new ActionListener() {
@@ -364,6 +380,7 @@ public class GraphGui {
                 sourcetext.setText(clearString);
                 sinktext.setText(clearString);
                 iotext1.setText(clearString);
+                outputStepsCheckBox.setSelected(false);
             }
         });
         myClearButton.setBounds(300, 410, 127, 20);
@@ -413,6 +430,7 @@ public class GraphGui {
                 boolean flag = false;
                 String[] strTmp = null;
                 int l = 0;
+                MaxFlow = outputStepsCheckBox.isSelected();
                 for (int i = 0; i < numofvertices; i++) {
                     String[] tmp = iotext1.getText().split("\n");
                     String str = "";
@@ -463,7 +481,7 @@ public class GraphGui {
                 if (flag) {
                     showMessageDialog(null, "distance invaild");
                 } else {
-                    drawRepresentation(digraph, "MaxFlow Input", list0, list0.get(0), 400, 400, Color.CYAN);
+                    drawRepresentation(digraph, "MaxFlow Input", list0, list0.get(0), 100, 100, Color.CYAN);
                     
                     int z = f.fordFulkerson(digraph, source, sink, numofvertices, list0);
                    
@@ -476,14 +494,14 @@ public class GraphGui {
         maxFlowFrame.getContentPane().add(btnGetMatrises);
         
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(23, 167, 250, 266);
+        scrollPane.setBounds(23, 147, 250, 266);
         maxFlowFrame.getContentPane().add(scrollPane);
         
         iotext1 = new JTextArea();
         iotext1.setFont(new Font("SansSerif", Font.BOLD, 14));
         scrollPane.setViewportView(iotext1);
         
-        maxflowlblNewLabel = new JLabel("input : vertix1<space>vertix2<space>distance<\\n>");
+        /*maxflowlblNewLabel = new JLabel("input : vertix1<space>vertix2<space>distance<\\n>");
         maxflowlblNewLabel.setBounds(23, 122, 400, 14);
         maxflowlblNewLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         maxFlowFrame.getContentPane().add(maxflowlblNewLabel);
@@ -491,7 +509,7 @@ public class GraphGui {
         maxflowlblNewLabel1 = new JLabel("Examble: 0 1 5 <\\n> 0 2 10 <\\n> 1 2 3 ");
         maxflowlblNewLabel1.setBounds(23, 131, 300, 25);
         maxflowlblNewLabel1.setFont(new Font("SansSerif", Font.BOLD, 14));
-        maxFlowFrame.getContentPane().add(maxflowlblNewLabel1);
+        maxFlowFrame.getContentPane().add(maxflowlblNewLabel1);*/
     }
 
     private void initialize() {
@@ -515,24 +533,31 @@ public class GraphGui {
         numofEdgestext.setFont(new Font("SansSerif", Font.BOLD, 14));
         frame.getContentPane().add(numofEdgestext);
         numofEdgestext.setColumns(10);
-         
+        
+        srctext = new JTextField();
+        srctext.setBounds(155, 65, 96, 20);
+        srctext.setFont(new Font("SansSerif", Font.BOLD, 14));
+        frame.getContentPane().add(srctext);
+        srctext.setColumns(10);
+        
+        
         JLabel lblNumberOfVertices = new JLabel("Number of vertices");
         lblNumberOfVertices.setBounds(10, 21, 150, 14);
         lblNumberOfVertices.setFont(new Font("SansSerif", Font.BOLD, 14));
         frame.getContentPane().add(lblNumberOfVertices);
 
-        lblNewLabel2 = new JLabel("Examble : 3");
+        /*lblNewLabel2 = new JLabel("Examble : 3");
         lblNewLabel2.setBounds(270, 21, 100, 14);
         lblNewLabel2.setFont(new Font("SansSerif", Font.BOLD, 14));
-        frame.getContentPane().add(lblNewLabel2);
+        frame.getContentPane().add(lblNewLabel2);*/
 
         JLabel lblNumberOfEdges = new JLabel("Number of Edgs");
         lblNumberOfEdges.setBounds(10, 41, 212, 27);
         lblNumberOfEdges.setFont(new Font("SansSerif", Font.BOLD, 14));
         frame.getContentPane().add(lblNumberOfEdges);
 
-        lblNewLabel3 = new JLabel("Examble : 3");
-        lblNewLabel3.setBounds(270, 41, 100, 14);
+        lblNewLabel3 = new JLabel("Source");
+        lblNewLabel3.setBounds(10, 71, 412, 14);
         lblNewLabel3.setFont(new Font("SansSerif", Font.BOLD, 14));
         frame.getContentPane().add(lblNewLabel3);
 
@@ -548,6 +573,12 @@ public class GraphGui {
         Dijkstra_directedCheckBox.setBackground(Color.PINK);
         frame.getContentPane().add(Dijkstra_directedCheckBox);
         
+        JCheckBox outputStepsCheckBox = new JCheckBox("Output Steps ");
+        outputStepsCheckBox.setBounds(300, 210, 300, 30);
+        outputStepsCheckBox.setFont(new Font("SansSerif", Font.BOLD, 13));
+        outputStepsCheckBox.setBackground(Color.PINK);
+        frame.getContentPane().add(outputStepsCheckBox);
+        
         
                 
          JButton myClearButton= new JButton("Clear");
@@ -557,8 +588,10 @@ public class GraphGui {
                 String clearString = new String("");
                 numofverticestext.setText(clearString);
                 numofEdgestext.setText(clearString);
+                srctext.setText(clearString);
                 DijkstraCheckBox.setSelected(false);
                 Dijkstra_directedCheckBox.setSelected(false);
+                outputStepsCheckBox.setSelected(false);
                 iotext.setText(clearString);
                 
             }
@@ -589,6 +622,7 @@ public class GraphGui {
                 numofvertices = 0;
                 numofvertices = Integer.parseInt(numofverticestext.getText());
                 numofEdges = Integer.parseInt(numofEdgestext.getText());
+                src = Integer.parseInt(srctext.getText());
                 
                 int costReprestentation[][] = new int[numofvertices][numofvertices];
 
@@ -635,6 +669,7 @@ public class GraphGui {
 
                         Dijkstra = DijkstraCheckBox.isSelected();
                         Dijkstra_directed = Dijkstra_directedCheckBox.isSelected();
+                        step = outputStepsCheckBox.isSelected();
                         if (!list0.contains(first)) {
                             list0.add(first);
                           
@@ -674,60 +709,103 @@ public class GraphGui {
                 }
                 if (Dijkstra_directed && !flag) {
                     
-                    list = m.dijkstra(digraph, 0, numofvertices);
+                    list = m.dijkstra(digraph, src, numofvertices);
+                    //System.out.println("list" + list);
                     costReprestentation = h.representOutput(list);
                     int counter = 0;
                     int c = 0;
+                    
+                   /* try {
+                                TimeUnit.SECONDS.sleep(10);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }*/
+                    
                     for (int i = 0; i < costReprestentation.length; i++) {
 
                         first = costReprestentation[i][0];
                         second = costReprestentation[i][1];
                         third = costReprestentation[i][2];
                         graph1[list0.indexOf(first)][list0.indexOf(second)] = third;
-
+                     if(step)
+                     {
                         if (counter <= 3) {
                             c++;
+                            try {
+                                TimeUnit.SECONDS.sleep(1);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                             drawRepresentation(graph1, "Step" + (i + 1), list0, list0.get(0), (400 * counter), 0, Color.CYAN);
+                            		
                         } else {
+                            		try {
+                                TimeUnit.SECONDS.sleep(1);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
                             counter = 0;
                             drawRepresentation(graph1, "Step " + (i + 1), list0, list0.get(0), (400 * counter), (100 * (counter + c)), Color.CYAN);
                         }
 
                         counter++;
+                     }
                     }
+                    if(!step){
                     drawRepresentation(graph1, "Output Directed Graph", list0, list0.get(0), 100, 100, Color.PINK);
                     drawRepresentation(digraph, "Input Graph", list0, list0.get(0), 750, 100, Color.PINK);
+                    }
                 }
                 if (Dijkstra && !flag) {
                     
                     int counter = 0, c = 0;
-                    list = m.dijkstra(graph, 0, numofvertices);
+                    list = m.dijkstra(graph, src, numofvertices);
+                    //System.out.println("list"+list);
                     costReprestentation = h.representOutput(list);
                     for (int i = 0; i < costReprestentation.length; i++) {
                         first = costReprestentation[i][0];
                         second = costReprestentation[i][1];
                         third = costReprestentation[i][2];
                         graph1[first][second] = third;
+                        
+                      if(step)
+                      {
                         if (counter <= 3) {
                             c++;
+                            
                             draw_Undirected(graph1, list0, list0.get(0), "Step" + (i + 1), (400 * counter), 0, Color.ORANGE);
+                            try {
+                                TimeUnit.SECONDS.sleep(1);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
 
                         } else {
                             counter = 0;
+                            
                             draw_Undirected(graph1, list0, list0.get(0), "Step " + (i + 1), (400 * counter), (100 * (counter + c)), Color.ORANGE);
-                        }
-                        counter++;
-
-                    }
-                    draw_Undirected(graph1, list0, list0.get(0), "Output Graph", 100, 100, Color.MAGENTA);
-                    for (int i = 0; i < numofvertices; i++) {
-                        for (int j = 0; j < numofvertices; j++) {
-                            if (graph[i][j] == graph[j][i]) {
-                                graph[j][i] = 0;
+                            try {
+                                TimeUnit.SECONDS.sleep(1);
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
                             }
                         }
+                        counter++;
+                      }
+
                     }
-                    draw_Undirected(graph, list0, list0.get(0), "Input Graph", 750, 100, Color.MAGENTA);
+                    if(!step)
+                    {
+                        draw_Undirected(graph1, list0, list0.get(0), "Output Graph", 100, 100, Color.MAGENTA);
+                        for (int i = 0; i < numofvertices; i++) {
+                            for (int j = 0; j < numofvertices; j++) {
+                                if (graph[i][j] == graph[j][i]) {
+                                    graph[j][i] = 0;
+                                }
+                            }
+                        }
+                        draw_Undirected(graph, list0, list0.get(0), "Input Graph", 750, 100, Color.MAGENTA);
+                    }
                 }
             }
 
@@ -736,18 +814,18 @@ public class GraphGui {
         btnGetMatrises.setBounds(50, 459, 127, 20);
         frame.getContentPane().add(btnGetMatrises);
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(23, 167, 250, 266);
+        scrollPane.setBounds(23, 147, 250, 266);
         frame.getContentPane().add(scrollPane);
         iotext = new JTextArea();
         iotext.setFont(new Font("SansSerif", Font.BOLD, 14));
         scrollPane.setViewportView(iotext);
-        lblNewLabel = new JLabel("input : vertix1<space>vertix2<space>distance<\\n>");
+        /*lblNewLabel = new JLabel("input : vertix1<space>vertix2<space>distance<\\n>");
         lblNewLabel.setBounds(23, 122, 400, 14);
         lblNewLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         frame.getContentPane().add(lblNewLabel);
         lblNewLabel1 = new JLabel("Examble: 0 1 5 <\\n> 0 2 10 <\\n> 1 2 3 ");
         lblNewLabel1.setBounds(23, 131, 300, 25);
         lblNewLabel1.setFont(new Font("SansSerif", Font.BOLD, 14));
-        frame.getContentPane().add(lblNewLabel1);
+        frame.getContentPane().add(lblNewLabel1);*/
     }
 }
