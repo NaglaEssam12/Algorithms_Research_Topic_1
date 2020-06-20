@@ -7,7 +7,7 @@ package alorithms_reaseach_paper;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+
 
 
 /**
@@ -80,12 +80,8 @@ public class MaxFlow {
             }
             if(GraphGui.MaxFlow)
             {
-                GraphGui.construct_graph1(graph,rGraph, "Step " + (X+1), list0, list0.get(0), 400 * X, 100,array[X%array.length]);
-                try {
-                                TimeUnit.SECONDS.sleep(1);
-                            } catch (InterruptedException ex) {
-                                ex.printStackTrace();
-                            }
+                GraphGui.construct_graph1(graph,rGraph, "Step " + (X+1), list0, list0.get(0), 400 * X, 100,array[X%array.length],1);
+                
                 X++;
             }
 
