@@ -126,8 +126,6 @@ public class GraphGui  {
 
                     window.initializeCoverFrame();
                     window.coverFrame.setVisible(true);
-                    //window.initializeFrame();
-                    // window.openFrame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
