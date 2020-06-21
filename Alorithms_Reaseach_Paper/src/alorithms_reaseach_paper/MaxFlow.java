@@ -84,11 +84,13 @@ public class MaxFlow {
                 
                 X++;
             }
-
+            
             // Add path flow to overall flow 
             max_flow += path_flow;
         
         }
+        if(!GraphGui.MaxFlow)
+            GraphGui.construct_graph1(graph,rGraph, "output " , list0, list0.get(0), 700 , 100,array[0],0);
         return max_flow;
     }
     
