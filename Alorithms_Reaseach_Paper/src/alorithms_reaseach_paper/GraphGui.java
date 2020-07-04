@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package alorithms_reaseach_paper;
+package algorithms_reaseach_paper;
 
 /**
  *
@@ -89,6 +89,8 @@ public class GraphGui  {
     int sink = 0;
     JTextArea iotext;
     JTextArea iotext1;
+   static JTextArea iotext2;
+    JButton report;
     private JLabel lblNewLabel;
     private JLabel lblNewLabel1;
     private JLabel lblNewLabel2;
@@ -111,6 +113,7 @@ public class GraphGui  {
     boolean Dijkstra_directed = false;
     static boolean MaxFlow = false;
     boolean step = false;
+    boolean flag1 = false;
     static boolean visible = true;
     static Timer timer;
     static ActionListener listen;
@@ -393,13 +396,22 @@ public class GraphGui  {
         vv.setPreferredSize(new Dimension(500, 480)); //Sets the viewing area size
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
         vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
-        vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), Color.BLACK, Color.BLUE));
+        vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), p , Color.BLUE));
 
         vv.getRenderContext().setEdgeFontTransformer(new ConstantTransformer(new Font("SansSerif", Font.BOLD, 14)));
-        vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
+        //vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
         JFrame frame = new JFrame(name);
         frame.setBounds(x1, y1, 300, 400);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        report = new JButton("Report");
+        report.setBounds(400,30,80,25);
+        report.setFont(new Font("SansSerif", Font.BOLD, 13));
+        report.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                draw_Report(costReprestentation , x1 , y1);
+            }
+        });
+        frame.getContentPane().add(report);
         vv.hide();
         int delay = 0;
         if(flag == 1){
@@ -424,9 +436,44 @@ public class GraphGui  {
         timer.start();
 
     }
+    public void draw_Report(int costReprestentation[][] , int x1 , int y1)
+    {
+        String output = "";
+        for (int i = 0; i < costReprestentation.length; i++) {
 
+            for (int j = 0; j < costReprestentation.length; j++) {
+                if (costReprestentation[i][j] != 0) {
+                    output+="     Distance between " + i;
+                    output+=" ";
+                    output+=j + " is  ";
+                    output +=costReprestentation[i][j] ;
+                    output+="\n";
+
+                }
+            }
+        }
+       // System.out.println("output" + output);
+        iotext2 = new JTextArea();
+        iotext2.setFont(new Font("SansSerif", Font.BOLD, 14));
+        iotext2.setText(output);
+        JFrame reportFrame = new JFrame("Report");
+        reportFrame.setBounds(x1,y1,400,400);
+        reportFrame.getContentPane().setLayout(null);
+        reportFrame.getContentPane().setBackground(Color.lightGray);
+        reportFrame.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setBounds(23, 0, 250, 350);
+        reportFrame.getContentPane().add(scrollPane);
+
+        scrollPane.setViewportView(iotext2);
+        reportFrame.setVisible(true);
+
+
+
+    }
     public void draw_Undirected(int costReprestentation[][], ArrayList<Integer> list0, int num, String name, int x1, int y1, Color p , int flag) {
-        SparseMultigraph<Integer, String> graph = new SparseMultigraph();
+        SparseMultigraph<Integer, Integer> graph = new SparseMultigraph();
         int c = 1;
         for (int i = 0; i < costReprestentation.length; i++) {
             graph.addVertex(num);
@@ -435,7 +482,8 @@ public class GraphGui  {
             for (int j = 0; j < costReprestentation.length; j++) {
                 if (costReprestentation[i][j] != 0) {
                     String s = "Distance " + c + ":" + "(" + costReprestentation[i][j] + ")";
-                    graph.addEdge(s, list0.get(i), list0.get(j));
+                  //  graph.addEdge(list0.get(i), list0.get(j));
+                    graph.addEdge(c,list0.get(i), list0.get(j));
                     c++;
                 }
             }
@@ -447,17 +495,29 @@ public class GraphGui  {
                 = new BasicVisualizationServer<Integer, String>(layout);
         vv.setPreferredSize(new Dimension(500, 480)); //Sets the viewing area size
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
-        vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
+        //vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
 
-        vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), Color.BLACK, Color.BLUE));
+        vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), p, Color.BLUE));
 
         vv.getRenderContext().setEdgeFontTransformer(new ConstantTransformer(new Font("SansSerif", Font.BOLD, 14)));
-        vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
+        //vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
 
         JFrame frame = new JFrame(name);
         frame.setBackground(Color.yellow);
         frame.setBounds(x1, y1, 600, 800);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+         report = new JButton("Report");
+        report.setBounds(400,30,80,25);
+        report.setFont(new Font("SansSerif", Font.BOLD, 13));
+        report.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                flag1 = true;
+                //draw_Report(costReprestentation , x1 , y1);
+            }
+        });
+        frame.getContentPane().add(report);
+
+        //System.out.println("report" + report.isSelected());
         vv.hide();
         int delay = 0;
         if(flag == 1){
@@ -481,7 +541,52 @@ public class GraphGui  {
         timer.setRepeats(false);
         timer.start();
     }
+    public static void draw_Report1(int graph1[][],int costReprestentation[][] , int x1 , int y1)
+    {
+        String output = "";
+        for (int i = 0; i < costReprestentation.length; i++) {
+            for (int j = 0; j < graph1.length; j++) {
+                if (graph1[i][j] != 0) {
+                    if(graph1[i][j] != costReprestentation[i][j]){
+                        output+="     Distance between " + i;
+                        output+=" ";
+                        output+=j + " is  ";
+                        output+=graph1[i][j] + "/";
+                        output+=costReprestentation[i][j] +"\n";
 
+                    }
+                    else
+                    {
+                        output+="     Distance between " + i;
+                        output+=" ";
+                        output+=j + " is  ";
+                        output+=graph1[i][j] + "\n";
+
+                    }
+
+                }
+            }
+        }
+        // System.out.println("output" + output);
+        iotext2 = new JTextArea();
+        iotext2.setFont(new Font("SansSerif", Font.BOLD, 14));
+        iotext2.setText(output);
+        JFrame reportFrame = new JFrame("Report");
+        reportFrame.setBounds(x1,y1,400,400);
+        reportFrame.getContentPane().setLayout(null);
+        reportFrame.getContentPane().setBackground(Color.lightGray);
+        reportFrame.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setBounds(23, 0, 250, 350);
+        reportFrame.getContentPane().add(scrollPane);
+
+        scrollPane.setViewportView(iotext2);
+        reportFrame.setVisible(true);
+
+
+
+    }
     public static void construct_graph1(int graph1[][], int costReprestentation[][], String name, ArrayList<Integer> list0, int num, int x1, int y1, Color p , int flag) {
 
         int x = 1;
@@ -514,13 +619,23 @@ public class GraphGui  {
         vv.setPreferredSize(new Dimension(600, 600)); //Sets the viewing area size
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
         vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
-        vv.getRenderContext().setVertexFillPaintTransformer(new VertexPaintTransformer(vv.getPickedVertexState()));
+        //vv.getRenderContext().setVertexFillPaintTransformer(new VertexPaintTransformer(vv.getPickedVertexState()));
+        vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), p, Color.BLUE));
         vv.getRenderContext().setEdgeFontTransformer(new ConstantTransformer(new Font("SansSerif", Font.BOLD, 12)));
-        vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
+        //vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
 
         JFrame frame1 = new JFrame(name);
         frame1.setBounds(x1, y1, 300, 400);
         frame1.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        JButton report = new JButton("Report");
+        report.setBounds(500,30,80,25);
+        report.setFont(new Font("SansSerif", Font.BOLD, 13));
+        report.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                draw_Report1(graph1,costReprestentation , x1 , y1);
+            }
+        });
+        frame1.getContentPane().add(report);
         vv.hide();
         int delay = 0;
         if(flag == 1){
@@ -972,6 +1087,9 @@ public class GraphGui  {
                         }
                     }
                     draw_Undirected(graph, list0, list0.get(0), "Input of Undirected Graph", 750, 100, Color.MAGENTA , 0);
+                    if(flag1 == true) {
+                        draw_Report(graph, 750, 100);
+                    }
                     for (int i = 0; i < costReprestentation.length; i++) {
                         first = costReprestentation[i][0];
                         second = costReprestentation[i][1];
@@ -984,12 +1102,19 @@ public class GraphGui  {
                             if (counter <= 3) {
                                 c++;
                                 draw_Undirected(graph1, list0, list0.get(0), "Step" + (i + 1), (400 * counter),(100 * hight) , Color.ORANGE , 1);
+                                if(flag1 == true) {
+                                    draw_Report(graph1, (400 * counter), (100 * hight));
+                                }
                             } else {
                                 hight +=2;
                                 if(hight == 8)
                                     hight = 0;
                                 counter = 0;
+
                                 draw_Undirected(graph1, list0, list0.get(0), "Step " + (i + 1), (400 * counter), (100 * hight), Color.ORANGE , 1);
+                                if(flag1)
+                                    draw_Report(graph1,(400 * counter),(400 * hight));
+
                             }
                             counter++;
                         }
@@ -1000,6 +1125,7 @@ public class GraphGui  {
                         draw_Undirected(graph1, list0, list0.get(0), "Output of Undirected Graph", 100, 100, Color.MAGENTA , 0);
                     }
                 }
+
             }
 
         });
@@ -1015,10 +1141,3 @@ public class GraphGui  {
 
     }
 }
-
-
-
-
-
-
-
