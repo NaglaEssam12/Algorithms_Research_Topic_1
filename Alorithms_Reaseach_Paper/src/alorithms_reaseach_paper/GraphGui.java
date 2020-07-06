@@ -641,7 +641,7 @@ public class GraphGui  {
         frame1.setBounds(x1, y1, 300, 400);
         frame1.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         if(flag == 0) {
-            maxFlowOutput = new JTextField("");
+            maxFlowOutput = new JTextField();
             maxFlowOutput.setBounds(10, 10, 250, 20);
             maxFlowOutput.setFont(new Font("SansSerif", Font.BOLD, 14));
             maxFlowOutput.addMouseListener(new MouseAdapter() {
@@ -650,7 +650,7 @@ public class GraphGui  {
             }
         });
             frame1.getContentPane().add(maxFlowOutput);
-           maxFlowOutput.setColumns(200);
+           maxFlowOutput.setColumns(250);
        }
        /* JButton report = new JButton("Report");
         report.setBounds(500,30,80,25);
