@@ -642,15 +642,15 @@ public class GraphGui  {
         frame1.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         if(flag == 0) {
             maxFlowOutput = new JTextField("");
-            maxFlowOutput.setBounds(10, 10, 150, 20);
+            maxFlowOutput.setBounds(10, 10, 250, 20);
             maxFlowOutput.setFont(new Font("SansSerif", Font.BOLD, 14));
             maxFlowOutput.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) {
-                maxFlowOutput.setText("The distance is " + result);
+                maxFlowOutput.setText("The maximum possible flow is " + result);
             }
         });
             frame1.getContentPane().add(maxFlowOutput);
-           maxFlowOutput.setColumns(100);
+           maxFlowOutput.setColumns(200);
        }
        /* JButton report = new JButton("Report");
         report.setBounds(500,30,80,25);
