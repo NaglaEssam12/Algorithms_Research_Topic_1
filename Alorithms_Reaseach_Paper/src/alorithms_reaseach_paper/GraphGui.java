@@ -19,6 +19,7 @@ import edu.uci.ics.jung.visualization.decorators.PickableVertexPaintTransformer;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
 import java.awt.Color;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import java.awt.Dimension;
@@ -42,6 +43,7 @@ import javax.imageio.ImageIO;
 import static javax.swing.JOptionPane.showMessageDialog;
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
+import java.awt.event.*;
 
 public class GraphGui  {
 
@@ -82,15 +84,18 @@ public class GraphGui  {
     private JTextField srctext;
     private JTextField sourcetext;
     private JTextField sinktext;
+    private static JTextField maxFlowOutput;
     static int numofvertices = 0;
     int numofEdges = 0;
     int source = 0;
     int src = 0;
     int sink = 0;
+    static  int result = 0;
     JTextArea iotext;
     JTextArea iotext1;
    static JTextArea iotext2;
     JButton report;
+   // static String output;
     private JLabel lblNewLabel;
     private JLabel lblNewLabel1;
     private JLabel lblNewLabel2;
@@ -364,9 +369,6 @@ public class GraphGui  {
         openFrame.getContentPane().add(backBttn);
 
     }
-
-
-
     public void drawRepresentation(int costReprestentation[][], String name, ArrayList<Integer> list0, int num, int x1, int y1, Color p , int flag) {
         construct_graph(costReprestentation, name, list0, num, x1, y1, p , flag);
     }
@@ -375,14 +377,13 @@ public class GraphGui  {
 
         int x = 1;
         int y = num;
-        DirectedSparseGraph<Integer, String> graph = new DirectedSparseGraph<Integer, String>();
+        DirectedSparseGraph<Integer, Integer> graph = new DirectedSparseGraph<Integer, Integer>();
         for (int i = 0; i < costReprestentation.length; i++) {
             graph.addVertex(y);
             y++;
             for (int j = 0; j < costReprestentation.length; j++) {
                 if (costReprestentation[i][j] != 0) {
-                    String s = "Distance " + x + ":" + "(" + costReprestentation[i][j] + ")";
-                    graph.addEdge(s, list0.get(i), list0.get(j), EdgeType.DIRECTED);
+                    graph.addEdge(x,list0.get(i), list0.get(j), EdgeType.DIRECTED);
                     x++;
                 }
             }
@@ -395,22 +396,20 @@ public class GraphGui  {
                 = new BasicVisualizationServer<Integer, String>(layout);
         vv.setPreferredSize(new Dimension(500, 480)); //Sets the viewing area size
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
-        vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
         vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), p , Color.BLUE));
 
         vv.getRenderContext().setEdgeFontTransformer(new ConstantTransformer(new Font("SansSerif", Font.BOLD, 14)));
-        //vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
         JFrame frame = new JFrame(name);
         frame.setBounds(x1, y1, 300, 400);
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         report = new JButton("Report");
         report.setBounds(400,30,80,25);
         report.setFont(new Font("SansSerif", Font.BOLD, 13));
-        report.addActionListener(new ActionListener() {
+        /*report.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 draw_Report(costReprestentation , x1 , y1);
             }
-        });
+        });*/
         frame.getContentPane().add(report);
         vv.hide();
         int delay = 0;
@@ -436,7 +435,7 @@ public class GraphGui  {
         timer.start();
 
     }
-    public void draw_Report(int costReprestentation[][] , int x1 , int y1)
+    public void draw_Report(String name , int costReprestentation[][] , int x1 , int y1 , int flag)
     {
         String output = "";
         for (int i = 0; i < costReprestentation.length; i++) {
@@ -452,11 +451,10 @@ public class GraphGui  {
                 }
             }
         }
-       // System.out.println("output" + output);
         iotext2 = new JTextArea();
         iotext2.setFont(new Font("SansSerif", Font.BOLD, 14));
         iotext2.setText(output);
-        JFrame reportFrame = new JFrame("Report");
+        JFrame reportFrame = new JFrame(name);
         reportFrame.setBounds(x1,y1,400,400);
         reportFrame.getContentPane().setLayout(null);
         reportFrame.getContentPane().setBackground(Color.lightGray);
@@ -465,12 +463,24 @@ public class GraphGui  {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(23, 0, 250, 350);
         reportFrame.getContentPane().add(scrollPane);
-
-        scrollPane.setViewportView(iotext2);
-        reportFrame.setVisible(true);
-
-
-
+        int delay = 0;
+        if(flag == 1) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            delay = (numofvertices - 1) * 1000;
+        }
+        timer = new Timer(delay, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reportFrame.setVisible(true);
+            }
+            });
+        timer.setRepeats(false);
+        timer.start();
+       scrollPane.setViewportView(iotext2);
     }
     public void draw_Undirected(int costReprestentation[][], ArrayList<Integer> list0, int num, String name, int x1, int y1, Color p , int flag) {
         SparseMultigraph<Integer, Integer> graph = new SparseMultigraph();
@@ -481,8 +491,6 @@ public class GraphGui  {
 
             for (int j = 0; j < costReprestentation.length; j++) {
                 if (costReprestentation[i][j] != 0) {
-                    String s = "Distance " + c + ":" + "(" + costReprestentation[i][j] + ")";
-                  //  graph.addEdge(list0.get(i), list0.get(j));
                     graph.addEdge(c,list0.get(i), list0.get(j));
                     c++;
                 }
@@ -495,12 +503,9 @@ public class GraphGui  {
                 = new BasicVisualizationServer<Integer, String>(layout);
         vv.setPreferredSize(new Dimension(500, 480)); //Sets the viewing area size
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
-        //vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
-
         vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), p, Color.BLUE));
 
         vv.getRenderContext().setEdgeFontTransformer(new ConstantTransformer(new Font("SansSerif", Font.BOLD, 14)));
-        //vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
 
         JFrame frame = new JFrame(name);
         frame.setBackground(Color.yellow);
@@ -509,15 +514,13 @@ public class GraphGui  {
          report = new JButton("Report");
         report.setBounds(400,30,80,25);
         report.setFont(new Font("SansSerif", Font.BOLD, 13));
-        report.addActionListener(new ActionListener() {
+        /*report.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 flag1 = true;
                 //draw_Report(costReprestentation , x1 , y1);
             }
-        });
+        });*/
         frame.getContentPane().add(report);
-
-        //System.out.println("report" + report.isSelected());
         vv.hide();
         int delay = 0;
         if(flag == 1){
@@ -541,7 +544,7 @@ public class GraphGui  {
         timer.setRepeats(false);
         timer.start();
     }
-    public static void draw_Report1(int graph1[][],int costReprestentation[][] , int x1 , int y1)
+    public static void draw_Report1(String name ,int graph1[][],int costReprestentation[][] , int x1 , int y1, int flag)
     {
         String output = "";
         for (int i = 0; i < costReprestentation.length; i++) {
@@ -567,11 +570,10 @@ public class GraphGui  {
                 }
             }
         }
-        // System.out.println("output" + output);
         iotext2 = new JTextArea();
         iotext2.setFont(new Font("SansSerif", Font.BOLD, 14));
         iotext2.setText(output);
-        JFrame reportFrame = new JFrame("Report");
+        JFrame reportFrame = new JFrame(name);
         reportFrame.setBounds(x1,y1,400,400);
         reportFrame.getContentPane().setLayout(null);
         reportFrame.getContentPane().setBackground(Color.lightGray);
@@ -581,8 +583,25 @@ public class GraphGui  {
         scrollPane.setBounds(23, 0, 250, 350);
         reportFrame.getContentPane().add(scrollPane);
 
+        int delay = 0;
+        if(flag == 1) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            delay = (numofvertices - 1) * 1000;
+        }
+        timer = new Timer(delay, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reportFrame.setVisible(true);
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
         scrollPane.setViewportView(iotext2);
-        reportFrame.setVisible(true);
+
 
 
 
@@ -593,24 +612,19 @@ public class GraphGui  {
         int y = num;
 
         String s = "";
-        DirectedSparseGraph<Integer, String> graph = new DirectedSparseGraph<Integer, String>();
+        DirectedSparseGraph<Integer, Integer> graph = new DirectedSparseGraph<Integer, Integer>();
         for (int i = 0; i < costReprestentation.length; i++) {
             graph.addVertex(y);
             y++;
             for (int j = 0; j < graph1.length; j++) {
                 if (graph1[i][j] != 0) {
-                    if(graph1[i][j] != costReprestentation[i][j]){
-                        s = "Distance " + x + ":" + "(" + graph1[i][j] + ")" + " / " + "(" + costReprestentation[i][j] + ")";
-                    }
-                    else
-                    {
-                        s = "Distance " + x + ":" + "(" + graph1[i][j] + ")";
-                    }
-                    graph.addEdge(s, list0.get(i), list0.get(j), EdgeType.DIRECTED);
+                    graph.addEdge(x, list0.get(i), list0.get(j), EdgeType.DIRECTED);
                     x++;
                 }
             }
         }
+
+
 
         Layout<Integer, String> layout = new CircleLayout(graph);
         layout.setSize(new Dimension(600, 600));
@@ -618,24 +632,35 @@ public class GraphGui  {
                 = new BasicVisualizationServer<Integer, String>(layout);
         vv.setPreferredSize(new Dimension(600, 600)); //Sets the viewing area size
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
-        vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
-        //vv.getRenderContext().setVertexFillPaintTransformer(new VertexPaintTransformer(vv.getPickedVertexState()));
         vv.getRenderContext().setVertexFillPaintTransformer(new PickableVertexPaintTransformer<Integer>(vv.getPickedVertexState(), p, Color.BLUE));
         vv.getRenderContext().setEdgeFontTransformer(new ConstantTransformer(new Font("SansSerif", Font.BOLD, 12)));
-        //vv.getRenderContext().setEdgeFillPaintTransformer(new PickableVertexPaintTransformer<String>(vv.getPickedEdgeState(), p, Color.BLUE));
+
+
 
         JFrame frame1 = new JFrame(name);
         frame1.setBounds(x1, y1, 300, 400);
         frame1.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        JButton report = new JButton("Report");
+        if(flag == 0) {
+            maxFlowOutput = new JTextField("");
+            maxFlowOutput.setBounds(10, 10, 150, 20);
+            maxFlowOutput.setFont(new Font("SansSerif", Font.BOLD, 14));
+            maxFlowOutput.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent me) {
+                maxFlowOutput.setText("The distance is " + result);
+            }
+        });
+            frame1.getContentPane().add(maxFlowOutput);
+           maxFlowOutput.setColumns(100);
+       }
+       /* JButton report = new JButton("Report");
         report.setBounds(500,30,80,25);
-        report.setFont(new Font("SansSerif", Font.BOLD, 13));
-        report.addActionListener(new ActionListener() {
+        report.setFont(new Font("SansSerif", Font.BOLD, 13));*/
+        /*report.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 draw_Report1(graph1,costReprestentation , x1 , y1);
             }
-        });
-        frame1.getContentPane().add(report);
+        });*/
+       // frame1.getContentPane().add(report);
         vv.hide();
         int delay = 0;
         if(flag == 1){
@@ -656,12 +681,11 @@ public class GraphGui  {
 
             }
         });
+        
         timer.setRepeats(false);
         timer.start();
 
     }
-
-
     private void initializeMaxFlow() {
         maxFlowFrame = new JFrame("Max Flow");
         maxFlowFrame.setBounds(450, 150, 500, 539);
@@ -828,8 +852,9 @@ public class GraphGui  {
                     showMessageDialog(null, "distance invaild");
                 } else {
                     drawRepresentation(digraph, "MaxFlow Input", list0, list0.get(0), 100, 100, Color.CYAN , 0);
+                    draw_Report("Report of Input",digraph,100,100 , 0);
 
-                    int z = f.fordFulkerson(digraph, source, sink, numofvertices, list0);
+                     result = f.fordFulkerson(digraph, source, sink, numofvertices, list0);
 
                 }
 
@@ -1046,6 +1071,7 @@ public class GraphGui  {
                     int c = 0;
                     int hight = 0;
                     drawRepresentation(digraph, "Input of Directed Graph", list0, list0.get(0), 750, 100, Color.PINK , 0);
+                    draw_Report("Report of Input ",digraph,750, 100,0);
                     for (int i = 0; i < costReprestentation.length; i++) {
 
                         first = costReprestentation[i][0];
@@ -1057,13 +1083,16 @@ public class GraphGui  {
                             if (counter <= 3) {
                                 c++;
                                 drawRepresentation(graph1, "Step" + (i + 1), list0, list0.get(0), (400 * counter), (100 * hight), Color.CYAN , 1);
+                                draw_Report("Report of Step " + (i+1),graph1,(400 * counter), (100 * hight),1);
 
                             } else {
                                 hight +=2;
                                 if(hight == 8)
                                     hight = 0;
                                 counter = 0;
+
                                 drawRepresentation(graph1, "Step " + (i + 1), list0, list0.get(0), (400 * counter), ((100 * hight)), Color.CYAN , 1);
+                                draw_Report("Report of Step " + (i+1),graph1,(400 * counter), (100 * hight),1);
                             }
 
                             counter++;
@@ -1072,6 +1101,7 @@ public class GraphGui  {
                     if(!step){
 
                         drawRepresentation(graph1, "Output of Directed Graph", list0, list0.get(0), 100, 100, Color.PINK , 0);
+                        draw_Report("Report of Output",graph1,100, 100,0);
                     }
                 }
                 if (Dijkstra && !flag) {
@@ -1086,10 +1116,9 @@ public class GraphGui  {
                             }
                         }
                     }
+
                     draw_Undirected(graph, list0, list0.get(0), "Input of Undirected Graph", 750, 100, Color.MAGENTA , 0);
-                    if(flag1 == true) {
-                        draw_Report(graph, 750, 100);
-                    }
+                    draw_Report("Report of Input",graph, 750, 100,0);
                     for (int i = 0; i < costReprestentation.length; i++) {
                         first = costReprestentation[i][0];
                         second = costReprestentation[i][1];
@@ -1101,10 +1130,9 @@ public class GraphGui  {
 
                             if (counter <= 3) {
                                 c++;
+
                                 draw_Undirected(graph1, list0, list0.get(0), "Step" + (i + 1), (400 * counter),(100 * hight) , Color.ORANGE , 1);
-                                if(flag1 == true) {
-                                    draw_Report(graph1, (400 * counter), (100 * hight));
-                                }
+                                draw_Report("Report of Step " + (i+1),graph1, (400 * counter), (100 * hight),1);
                             } else {
                                 hight +=2;
                                 if(hight == 8)
@@ -1112,9 +1140,7 @@ public class GraphGui  {
                                 counter = 0;
 
                                 draw_Undirected(graph1, list0, list0.get(0), "Step " + (i + 1), (400 * counter), (100 * hight), Color.ORANGE , 1);
-                                if(flag1)
-                                    draw_Report(graph1,(400 * counter),(400 * hight));
-
+                                draw_Report("Report of Step " + (i+1),graph1,(400 * counter),(100 * hight),1);
                             }
                             counter++;
                         }
@@ -1123,6 +1149,7 @@ public class GraphGui  {
                     if(!step)
                     {
                         draw_Undirected(graph1, list0, list0.get(0), "Output of Undirected Graph", 100, 100, Color.MAGENTA , 0);
+                        draw_Report("Report of Output",graph1,100,100,0);
                     }
                 }
 
