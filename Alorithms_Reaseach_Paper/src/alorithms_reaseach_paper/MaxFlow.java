@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package alorithms_reaseach_paper;
+package algorithms_reaseach_paper;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -81,6 +81,7 @@ public class MaxFlow {
             if(GraphGui.MaxFlow)
             {
                 GraphGui.construct_graph1(graph,rGraph, "Step " + (X+1), list0, list0.get(0), 400 * X, 100,array[X%array.length],1);
+                GraphGui.draw_Report1("Report of Step " + (X+1) , graph,rGraph , 400 * X , 100 , 1);
                 
                 X++;
             }
@@ -89,8 +90,11 @@ public class MaxFlow {
             max_flow += path_flow;
         
         }
-        if(!GraphGui.MaxFlow)
-            GraphGui.construct_graph1(graph,rGraph, "output " , list0, list0.get(0), 700 , 100,array[0],0);
+        if(!GraphGui.MaxFlow) {
+            GraphGui.construct_graph1(graph, rGraph, "output ", list0, list0.get(0), 700, 100, array[0], 0);
+            GraphGui.draw_Report1("Report of Output" , graph,rGraph,700,200 , 0);
+        }
+
         return max_flow;
     }
     
